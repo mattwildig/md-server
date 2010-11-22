@@ -4,14 +4,15 @@ require 'sinatra'
 require 'rdiscount'
 
 set :views, Dir.getwd
+enable :run
 
 get "/" do
-  @files = Dir.glob "*.md"
+  @files = Dir["*.{md,markdown,mkd}"]
   erb :index
 end
 
-get "/:file.md" do
-  markdown params[:file].to_sym
+get %r{/(.*).(md|markdown|mkd)} do
+  markdown params[:captures][0].to_sym
 end
 
 __END__
