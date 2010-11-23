@@ -8,11 +8,22 @@ enable :run
 
 get "/" do
   @files = Dir["*.{md,markdown,mkd}"]
-  erb :index
+  puts @files
+  if @files == []
+    "No markdown files found."
+  else
+    erb :index
+  end
 end
 
-get %r{/(.*).(md|markdown|mkd)} do
-  markdown params[:captures][0].to_sym
+get %r{/(^(.*).(md|markdown|mkd)$)} do
+  begin
+    md = File.read params[:captures][0]
+  rescue Errno::ENOENT
+    return "No such file: #{params[:captures][0]}"
+  end
+  
+  Markdown.new(md).to_html  
 end
 
 __END__
