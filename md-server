@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'rubygems'
 require 'sinatra'
 require 'rdiscount'
 
@@ -8,7 +9,6 @@ enable :run
 
 get "/" do
   @files = Dir["*.{md,markdown,mkd}"]
-  puts @files
   if @files == []
     "No markdown files found."
   else
@@ -16,7 +16,7 @@ get "/" do
   end
 end
 
-get %r{/(^(.*).(md|markdown|mkd)$)} do
+get %r{^/((.*)\.(md|markdown|mkd)$)} do
   begin
     md = File.read params[:captures][0]
   rescue Errno::ENOENT
