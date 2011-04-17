@@ -4,7 +4,7 @@ spec = Gem::Specification.new do |s|
   s.summary = 'Simple server to show you what your markdown looks like when converted to html.'
   s.files = ['md-server']
   s.add_dependency 'sinatra'
-  s.add_dependency 'rdiscount'
+  s.add_dependency 'tilt'
   s.bindir = '.'
   s.executables = %w{md-server}
 end
