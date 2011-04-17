@@ -12,7 +12,11 @@ end
 get %r{^/((.*)$)} do
   name = params[:captures][0]
   if Tilt[name]
-    Tilt.new(name).render
+    begin
+      Tilt.new(name).render
+    rescue Errno::ENOENT
+      [404, "No such file \"#{name}\""]
+    end
   elsif File.directory?(name)
     files(name)
   else
