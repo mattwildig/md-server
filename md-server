@@ -1,27 +1,26 @@
 #!/usr/bin/env ruby
 
 require 'sinatra'
-require 'rdiscount'
+require 'tilt'
 
 enable :run
 
 get "/" do
-  @files = Dir["*.{md,markdown,mkd}"]
+  @files = Dir["*"].select{|f| Tilt[f]}
   if @files == []
-    "No markdown files found."
+    "No template files found."
   else
     erb :index
   end
 end
 
-get %r{^/((.*)\.(md|markdown|mkd)$)} do
-  begin
-    md = File.read params[:captures][0]
-  rescue Errno::ENOENT
-    return "No such file: #{params[:captures][0]}"
+get %r{^/((.*)$)} do
+  name = params[:captures][0]
+  if Tilt[name]
+    Tilt.new(name).render
+  else
+    [404, "Nothing to render for \"#{name}\""]
   end
-  
-  Markdown.new(md).to_html  
 end
 
 __END__
