@@ -6,20 +6,28 @@ require 'tilt'
 enable :run
 
 get "/" do
-  @files = Dir["*"].select{|f| Tilt[f]}
-  if @files == []
-    "No template files found."
-  else
-    erb :index
-  end
+  files(".")
 end
 
 get %r{^/((.*)$)} do
   name = params[:captures][0]
   if Tilt[name]
     Tilt.new(name).render
+  elsif File.directory?(name)
+    files(name)
   else
     [404, "Nothing to render for \"#{name}\""]
+  end
+end
+
+helpers do
+  def files(dir)
+    @files = Dir[File.join(dir, "*")].select{|f| Tilt[f] || File.directory?(f)}
+    if @files == []
+      "No template files found."
+    else
+      erb :index
+    end
   end
 end
 
@@ -29,7 +37,7 @@ __END__
 
 <ul>
 <% @files.each do |f| %>
-  <%="<li><a href='#{f}'>#{f}</a></li>"%>
+  <%="<li><a href='#{f}'>#{File.basename f}</a></li>"%>
 <%end%>
 </ul>
   
