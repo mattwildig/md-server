@@ -24,14 +24,12 @@ get %r{^/((.*)$)} do
   end
 end
 
-helpers do
-  def files(dir)
-    @files = Dir[File.join(dir, "*")].select{|f| Tilt[f] || File.directory?(f)}
-    if @files == []
-      "No template files found."
-    else
-      erb :index
-    end
+def files(dir)
+  @files = Dir[File.join(dir, "*")].select{|f| Tilt[f] || File.directory?(f)}
+  if @files == []
+    "No template files found."
+  else
+    erb :index
   end
 end
 
