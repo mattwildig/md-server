@@ -1,44 +1,41 @@
 #!/usr/bin/env ruby
 
-require 'sinatra'
+require 'rack'
+require 'erb'
 require 'tilt'
 
-enable :run
-
-get "/" do
-  files(".")
-end
-
-get %r{^/((.*)$)} do
-  name = params[:captures][0]
-  if Tilt[name]
-    begin
-      Tilt.new(name).render
-    rescue Errno::ENOENT
-      [404, "No such file \"#{name}\""]
-    end
-  elsif File.directory?(name)
-    files(name)
-  else
-    [404, "Nothing to render for \"#{name}\""]
-  end
-end
+@template = DATA.read
 
 def files(dir)
-  @files = Dir[File.join(dir, "*")].select{|f| Tilt[f] || File.directory?(f)}
-  if @files == []
-    "No template files found."
+  dir_contents = Dir[File.join(dir, "*")].select{|f| Tilt[f] || File.directory?(f)}
+  if dir_contents == []
+    [200, {"Content-Type" => "text/html"}, ["No template files found."]]
   else
-    erb :index
+    result = ERB.new(@template).result binding
+    return [200, {"Content-Type" => "text/html"}, [result]]
   end
 end
+
+app = lambda do |env|
+  path = env['PATH_INFO'][1..-1]
+  
+  begin
+    return [200, {"Content-Type" => "text/html"}, [Tilt.new(path).render]]
+  rescue Errno::ENOENT
+    return [404, {"Content-Type" => "text/html"}, "No such file \"#{name}\""]
+  end if Tilt[path]
+  
+  return files(".") if path.empty?
+  return files(path) if File.directory? path
+  [404, {"Content-Type" => "text/html"}, ["Nothing to render for \"#{path}\""]]
+end
+
+Rack::Server.start :app => app, :Port => 9292
 
 __END__
 
-@@index
-
 <ul>
-<% @files.each do |f| %>
+<% dir_contents.each do |f| %>
   <%="<li><a href='#{f}'>#{File.basename f}</a></li>"%>
 <%end%>
 </ul>
