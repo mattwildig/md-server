@@ -22,7 +22,7 @@ app = lambda do |env|
   begin
     return [200, {"Content-Type" => "text/html"}, [Tilt.new(path).render]]
   rescue Errno::ENOENT
-    return [404, {"Content-Type" => "text/html"}, "No such file \"#{name}\""]
+    return [404, {"Content-Type" => "text/html"}, ["No such file \"#{path}\""]]
   end if Tilt[path]
   
   return files(".") if path.empty?
