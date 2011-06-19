@@ -1,20 +1,9 @@
 #!/usr/bin/env ruby
 
 require 'rack'
-require 'erb'
 require 'tilt'
 
-@template = DATA.read
-
-def files(dir)
-  dir_contents = Dir[File.join(dir, "*")].select{|f| Tilt[f] || File.directory?(f)}
-  if dir_contents == []
-    [200, {"Content-Type" => "text/html"}, ["No template files found."]]
-  else
-    result = ERB.new(@template).result binding
-    return [200, {"Content-Type" => "text/html"}, [result]]
-  end
-end
+@files = Rack::Directory.new('.')
 
 app = lambda do |env|
   path = env['PATH_INFO'][1..-1]
@@ -25,18 +14,9 @@ app = lambda do |env|
     return [404, {"Content-Type" => "text/html"}, ["No such file \"#{path}\""]]
   end if Tilt[path]
   
-  return files(".") if path.empty?
-  return files(path) if File.directory? path
-  [404, {"Content-Type" => "text/html"}, ["Nothing to render for \"#{path}\""]]
+  @files.call(env)
 end
 
 Rack::Server.start :app => app, :Port => 9292
 
-__END__
-
-<ul>
-<% dir_contents.each do |f| %>
-  <%="<li><a href='#{f}'>#{File.basename f}</a></li>"%>
-<%end%>
-</ul>
   
