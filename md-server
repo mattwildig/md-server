@@ -12,10 +12,10 @@ app = lambda do |env|
   path = env['PATH_INFO'][1..-1]
   
   begin
-    return [200, {"Content-Type" => "text/html"}, [Tilt.new(path).render]]
+    return [200, {"Content-Type" => "text/html"}, [Tilt.new(path).render]] if Tilt[path]
   rescue Errno::ENOENT
-    return [404, {"Content-Type" => "text/html"}, ["No such file \"#{path}\""]]
-  end if Tilt[path]
+    #404 will be created automatically
+  end 
   
   @files.call(env)
 end
