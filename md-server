@@ -3,6 +3,9 @@
 require 'rack'
 require 'tilt'
 
+#this might be useful, but doesn't work in chrome
+Rack::Mime::MIME_TYPES.merge! '.gemspec' => 'text/plain'
+
 @files = Rack::Directory.new('.')
 
 app = lambda do |env|
