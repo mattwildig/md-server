@@ -7,4 +7,5 @@ spec = Gem::Specification.new do |s|
   s.add_dependency 'tilt'
   s.bindir = '.'
   s.executables = %w{md-server}
+  s.authors= ['Matt Wildig']
 end
