@@ -2,7 +2,7 @@
 
 require 'rack'
 require 'tilt'
-require File.join(File.dirname(__FILE__), 'rack-add-headers')
+require 'rack/contrib'
 
 %w{gemspec rb}.each do |ext|
   Rack::Mime::MIME_TYPES.merge! ".#{ext}" => 'text/plain'
@@ -12,7 +12,10 @@ app = Rack::Builder.app do
 
   files = Rack::Directory.new('.')
 
-  use AddHeaders, 'X-Content-Type-Options' => 'nosniff', 'Cache-Control' => 'no-store'
+  use Rack::ResponseHeaders do |headers|
+    headers['X-Content-Type-Options'] = 'nosniff'
+    headers['Cache-Control'] = 'no-store'
+  end
   
   run lambda { |env|
     path = env['PATH_INFO'][1..-1]
