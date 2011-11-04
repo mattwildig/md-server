@@ -4,9 +4,7 @@ require 'rack'
 require 'tilt'
 require 'rack/contrib'
 
-%w{gemspec rb}.each do |ext|
-  Rack::Mime::MIME_TYPES.merge! ".#{ext}" => 'text/plain'
-end
+Rack::Mime::MIME_TYPES.merge! Hash[Rack::Mime::MIME_TYPES.map{|k,v| [k, 'text/plain'] if v.start_with?('text/x-') }.compact]
 
 app = Rack::Builder.app do
 
