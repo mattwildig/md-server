@@ -39,6 +39,6 @@ EOS
   def convert_root(*args)
     result = super # super needs to be called first to set @title.
     title = "<title>#{@title}</title>" if @title
-    "<!DOCTYPE html>\n#{title}\n#{STYLE}\n#{result}"
+    "<!DOCTYPE html>\n<meta charset=\"utf-8\">\n#{title}\n#{STYLE}\n#{result}"
   end
 end
