@@ -4,7 +4,11 @@ require 'rack'
 require 'tilt'
 require 'rack/contrib'
 
+require 'nice_kramdown_template'
+
 Rack::Mime::MIME_TYPES.merge! Hash[Rack::Mime::MIME_TYPES.map{|k,v| [k, 'text/plain'] if v.start_with?('text/x-') }.compact]
+
+Tilt.register(NiceKramdownTemplate, 'md')
 
 app = Rack::Builder.app do
 
